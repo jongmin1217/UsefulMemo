@@ -28,12 +28,18 @@ class GetMemoUseCase @Inject constructor(private val repository: MemoRepository)
     }
 
     fun observableMemoList(
+        type: Int,
         onSuccess: ((t: List<Memo>) -> Unit),
         onError: ((t: Throwable) -> Unit),
         onFinished: () -> Unit = {}
     ) {
+        clearDisposable()
         addDisposable(
-            repository.getAllMemo()
+            if (type == Constants.ACTIVE) {
+                repository.getAllMemo()
+            } else {
+                repository.getDeleteMemo()
+            }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterTerminate(onFinished)
@@ -47,6 +53,7 @@ class GetMemoUseCase @Inject constructor(private val repository: MemoRepository)
         onError: ((t: Throwable) -> Unit),
         onFinished: () -> Unit = {}
     ) {
+        clearDisposable()
         addDisposable(
             repository.getFolderMemo(folderId)
                 .subscribeOn(Schedulers.io())
@@ -75,7 +82,7 @@ class GetMemoUseCase @Inject constructor(private val repository: MemoRepository)
     }
 
     fun deleteFolderMemo(
-        folder : Folder,
+        folder: Folder,
         onFinished: () -> Unit = {}
     ) {
         addDisposable(

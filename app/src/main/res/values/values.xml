@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr format="color" name="splashBackground"/>
     <attr format="color" name="basicTextColor"/>
+    <attr format="color" name="listBackground"/>
+    <attr format="color" name="lineColor"/>
 </resources>

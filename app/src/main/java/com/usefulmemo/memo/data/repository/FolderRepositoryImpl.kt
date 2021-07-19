@@ -14,4 +14,5 @@ class FolderRepositoryImpl @Inject constructor(
     override fun getFolder(): Observable<List<Folder>> = dataSource.getFolder()
     override fun insertFolder(folder : Folder) : Completable = dataSource.insertFolder(folder)
     override fun deleteFolder(id : Long) : Completable = dataSource.deleteFolder(id)
+    override fun updateFolder(folder : Folder) : Completable = dataSource.updateFolder(folder)
 }

@@ -23,9 +23,5 @@ abstract class BaseActivity <B : ViewDataBinding, VM : BaseViewModel>(@LayoutRes
         observe()
     }
 
-    open fun observe(){
-        with(viewModel){
-
-        }
-    }
+    open fun observe(){}
 }

@@ -1,13 +1,14 @@
 package com.usefulmemo.memo.ui.main
 
-import android.provider.SyncStateContract
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import com.usefulmemo.memo.MyApplication
+import com.usefulmemo.memo.R
 import com.usefulmemo.memo.base.BaseViewModel
 import com.usefulmemo.memo.domain.model.Folder
-import com.usefulmemo.memo.domain.model.Memo
 import com.usefulmemo.memo.domain.usecase.GetFolderUseCase
 import com.usefulmemo.memo.domain.usecase.GetMemoUseCase
 import com.usefulmemo.memo.utils.Constants
+import com.usefulmemo.memo.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,64 +19,120 @@ class MainViewModel @Inject constructor(
     private val getMemoUseCase: GetMemoUseCase
 ) : BaseViewModel() {
 
-    val test = MutableLiveData<String>()
+    var folderItems = SingleLiveEvent<ArrayList<Folder>>().default(ArrayList())
+    private val _memo = SingleLiveEvent<Unit>()
+    private val _back = SingleLiveEvent<Unit>()
 
-    fun getResult() {
+    val memo: LiveData<Unit> get() = _memo
+    val back: LiveData<Unit> get() = _back
+
+    var previousStatus = 0
+
+    init {
         getFolderUseCase.observableFolderList(
             onSuccess = {
-                Timber.d("timberMsg getFolderUseCase success $it")
+                val list = (it as ArrayList<Folder>).apply {
+                    add(
+                        0,
+                        Folder(
+                            Constants.MEMO.toLong(),
+                            MyApplication.mInstance.resources.getString(R.string.memo)
+                        )
+                    )
+                    add(
+                        0,
+                        Folder(
+                            Constants.ALL_MEMO.toLong(),
+                            MyApplication.mInstance.resources.getString(R.string.all_memo)
+                        )
+                    )
+                    add(
+                        Folder(
+                            Constants.DELETE_MEMO.toLong(),
+                            MyApplication.mInstance.resources.getString(R.string.delete_memo)
+                        )
+                    )
+                }
+                folderItems.value = list
             },
             onError = {
-                Timber.d("timberMsg getFolderUseCase error $it")
-            },
-            onFinished = {
-                Timber.d("timberMsg getFolderUseCase finish")
-            }
-        )
-
-        getMemoUseCase.observableMemoList(
-            onSuccess = {
-                Timber.d("timberMsg observableMemoList success $it")
-            },
-            onError = {
-                Timber.d("timberMsg observableMemoList error $it")
-            }
-        )
-
-        getMemoUseCase.singleMemo(1,
-            onSuccess = {
-                Timber.d("timberMsg singleMemo success $it")
-            },
-            onError = {
-                Timber.d("timberMsg singleMemo error $it")
-            },
-            onFinished = {
-                Timber.d("timberMsg singleMemo finish")
-            }
-        )
-    }
-
-    fun test() {
-        getMemoUseCase.completableMemo(Memo(0, "fd", 123, true, 0), Constants.INSERT)
-    }
-
-    fun test2() {
-        getMemoUseCase.clearDisposable()
-        getMemoUseCase.observableMemoFolderList(0,
-            onSuccess = {
-                Timber.d("timberMsg observableMemoFolderList success $it")
-            },
-            onError = {
-                Timber.d("timberMsg observableMemoFolderList error $it")
-            },
-            onFinished = {
-                Timber.d("timberMsg observableMemoFolderList finish")
+                Timber.d("timber folder list error $it")
             }
         )
     }
 
-    fun test3() {
-        getFolderUseCase.completableMemo(Folder(0, "ds"), Constants.INSERT)
+    override fun addFolderClick() {
+        getFolderUseCase.completableMemo(Folder(0, "새로운 폴더"), Constants.INSERT)
+    }
+
+    override fun writeClick() {
+        val list = folderItems.value
+        list?.let {
+            val item = it[it.size - 2]
+            getFolderUseCase.completableMemo(item, Constants.DELETE)
+        }
+    }
+
+    override fun backClick() {
+        _back.value = Unit
+    }
+
+    fun folderClick(folder: Folder) {
+        previousStatus = Constants.FOLDER_UI
+
+        when (folder.id.toInt()) {
+            Constants.ALL_MEMO -> getAllMemo()
+            Constants.MEMO -> getFolderMemo(folder.id)
+            else -> getDeleteMemo()
+        }
+
+        setTitle(
+            backVisible = true,
+            addFolderVisible = false,
+            text = folder.name
+        )
+    }
+
+    fun setTitle(
+        backVisible: Boolean? = null,
+        addFolderVisible: Boolean? = null,
+        writeVisible: Boolean? = null,
+        text: String? = null
+    ) {
+        backVisible?.let { titleBackVisible.value = it }
+        addFolderVisible?.let { titleAddFolderVisible.value = it }
+        writeVisible?.let { titleWriteVisible.value = it }
+        text?.let { titleText.value = it }
+    }
+
+    private fun getAllMemo() {
+        getMemoUseCase.observableMemoList(Constants.ACTIVE,
+            onSuccess = {
+                _memo.value = Unit
+            },
+            onError = {
+                Timber.d("timber getAllMemo error $it")
+            })
+    }
+
+    private fun getDeleteMemo() {
+        getMemoUseCase.observableMemoList(Constants.INACTIVE,
+            onSuccess = {
+                _memo.value = Unit
+            },
+            onError = {
+                Timber.d("timber getDeleteMemo error $it")
+            })
+    }
+
+    private fun getFolderMemo(folderId: Long) {
+        getMemoUseCase.observableMemoFolderList(folderId,
+            onSuccess = {
+                _memo.value = Unit
+            },
+            onError = {
+                Timber.d("timber getFolderMemo error $it")
+            })
     }
 
 }

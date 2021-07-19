@@ -9,4 +9,5 @@ interface FolderRepository {
     fun getFolder() : Observable<List<Folder>>
     fun insertFolder(folder : Folder) : Completable
     fun deleteFolder(id : Long) : Completable
+    fun updateFolder(folder : Folder) : Completable
 }

@@ -33,6 +33,7 @@ class GetFolderUseCase @Inject constructor(private val repository: FolderReposit
         addDisposable(
             when (type) {
                 Constants.INSERT -> repository.insertFolder(folder)
+                Constants.UPDATE -> repository.updateFolder(folder)
                 else -> repository.deleteFolder(folder.id)
             }
                 .subscribeOn(Schedulers.io())

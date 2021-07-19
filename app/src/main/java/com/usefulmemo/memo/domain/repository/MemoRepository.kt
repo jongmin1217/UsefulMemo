@@ -13,4 +13,5 @@ interface MemoRepository {
     fun updateMemo(memo: Memo) : Completable
     fun deleteMemo(id : Long) : Completable
     fun deleteFolderMemo(folderId : Long) : Completable
+    fun getDeleteMemo() : Observable<List<Memo>>
 }

@@ -9,10 +9,13 @@ import io.reactivex.Single
 @Dao
 interface MemoDao {
 
-    @Query("SELECT * FROM memo ORDER BY regDate DESC")
+    @Query("SELECT * FROM memo WHERE active = 1 ORDER BY regDate DESC")
     fun getAllMemo() : Observable<List<Memo>>
 
-    @Query("SELECT * FROM memo WHERE folderId = :folderId ORDER BY regDate DESC")
+    @Query("SELECT * FROM memo WHERE active = 0 ORDER BY regDate DESC")
+    fun getDeleteMemo() : Observable<List<Memo>>
+
+    @Query("SELECT * FROM memo WHERE folderId = :folderId AND active = 1 ORDER BY regDate DESC")
     fun getFolderMemo(folderId : Long) : Observable<List<Memo>>
 
     @Query("SELECT * FROM memo WHERE id = :memoId")

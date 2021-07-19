@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="vm"
+            type="com.usefulmemo.memo.base.BaseViewModel"/>
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        tools:ignore="ContentDescription,SpUsage"
+        >
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="25dp"
+            android:background="@drawable/back"
+            android:visibility="@{vm.titleBackVisible ? View.VISIBLE : View.GONE}"
+            viewClick="@{()->vm.backClick()}"
+            />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/basicTextColor"
+            android:textSize="@dimen/dp_25"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_back"
+            marginStart="@{vm.titleBackVisible ? @dimen/dp_10 : @dimen/dp_25}"
+            android:text="@{vm.titleText}"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:id="@+id/iv_add_folder"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv_write"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/folder_add"
+            android:visibility="@{vm.titleAddFolderVisible ? View.VISIBLE : View.INVISIBLE}"
+            viewClick="@{()->vm.addFolderClick()}"
+            />
+
+        <ImageView
+            android:id="@+id/iv_write"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/write"
+            android:visibility="@{vm.titleWriteVisible ? View.VISIBLE : View.INVISIBLE}"
+            viewClick="@{()->vm.writeClick()}"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

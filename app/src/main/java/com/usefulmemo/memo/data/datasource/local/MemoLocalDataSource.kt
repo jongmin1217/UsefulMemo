@@ -21,4 +21,5 @@ class MemoLocalDataSource @Inject constructor(
     fun updateMemo(memo: Memo) : Completable = local.updateMemo(memo)
     fun deleteMemo(id : Long) : Completable = local.deleteMemo(id)
     fun deleteFolderMemo(folderId : Long) : Completable = local.deleteFolderMemo(folderId)
+    fun getDeleteMemo() : Observable<List<Memo>> = local.getDeleteMemo()
 }

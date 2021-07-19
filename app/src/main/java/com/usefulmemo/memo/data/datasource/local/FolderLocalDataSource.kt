@@ -13,4 +13,5 @@ class FolderLocalDataSource @Inject constructor(
     fun getFolder() : Observable<List<Folder>> = local.getFolder()
     fun insertFolder(folder : Folder) : Completable = local.insertFolder(folder)
     fun deleteFolder(id : Long) : Completable = local.deleteFolder(id)
+    fun updateFolder(folder : Folder) : Completable = local.updateFolder(folder)
 }

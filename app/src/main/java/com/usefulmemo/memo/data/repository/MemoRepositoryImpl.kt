@@ -18,4 +18,5 @@ class MemoRepositoryImpl @Inject constructor(
     override fun updateMemo(memo: Memo) : Completable = dataSource.updateMemo(memo)
     override fun deleteMemo(id : Long) : Completable = dataSource.deleteMemo(id)
     override fun deleteFolderMemo(folderId : Long) : Completable = dataSource.deleteFolderMemo(folderId)
+    override fun getDeleteMemo() : Observable<List<Memo>> = dataSource.getDeleteMemo()
 }
