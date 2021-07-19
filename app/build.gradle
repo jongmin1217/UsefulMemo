@@ -2,32 +2,40 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
 }
-apply plugin: "org.jetbrains.kotlin.android.extensions"
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.android.application'
 
-androidExtensions {
-    experimental = true
-}
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/parkjongmin/AndroidStudioProjects/UsefulMemo/UsefulMemoKey')
+            storePassword 'whdals1217'
+            keyAlias 'UsefulMemoKey'
+            keyPassword 'whdals1217'
+        }
+    }
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "com.example.usefulmemo"
+        applicationId "com.usefulmemo.memo"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
-
+        versionName BuildNumber()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        archivesBaseName = "UsefulMemo-$versionName-$versionCode"
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled false
         }
     }
     compileOptions {
@@ -37,6 +45,68 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    flavorDimensions "default"
+
+    productFlavors {
+        production {
+            dimension "default"
+            resValue "string", "app_name", "Useful Memo"
+            buildConfigField ("String", "ROOM_NAME", "\"usefulMemo\"")
+        }
+        beta {
+            dimension "default"
+            applicationIdSuffix ".beta"
+            resValue "string", "app_name", "Useful Memo β"
+            buildConfigField ("String", "ROOM_NAME", "\"usefulMemo-beta\"")
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+        dataBinding true
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+def BuildNumber() {
+    def versionFile = file("${project.projectDir}/version.properties")
+    def version = new Properties()
+    def stream
+    try {
+        stream = version.load(new FileInputStream(versionFile))
+    } catch (FileNotFoundException ignore) {
+    } finally {
+        if (stream != null) stream.close()
+    }
+    def build
+    if(version['BUILD'] == null) {
+        build = 1
+    }else{
+        build = version['BUILD'] as int
+    }
+
+    def runTasks = gradle.startParameter.taskNames
+    if (runTasks.toString().contains('assembleRelease') ||
+            runTasks.toString().contains('aR') ||
+            runTasks.toString().contains('assemble') ||
+            runTasks.toString().contains('extractApksFor')) {
+        build++
+    } else {
+        System.console().println('##DEBUG## ' + runTasks)
+    }
+    version['BUILD'] = build.toString()
+    version.store(versionFile.newWriter(), null)
+
+
+    //def versionString = version['MAJOR'] + '.' + version['MINOR'] + '.' + version['BUILD']
+    def versionString = "1.0.0"
+
+    return versionString
 }
 
 dependencies {
@@ -65,17 +135,6 @@ dependencies {
     //data binding
     kapt "com.android.databinding:compiler:3.2.1"
 
-    //retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.6.2'
-
-    //okHttp
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.5'
-    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
-
-    //rx retrofit
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
-
     //rx android
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.20'
@@ -95,17 +154,4 @@ dependencies {
 
     //timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
-
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
-
-    // image crop
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
-
-    implementation 'com.github.esafirm.android-image-picker:imagepicker:2.4.1'
-    implementation 'com.github.esafirm.android-image-picker:rximagepicker:2.4.1'
-
-    // permission
-    implementation 'com.karumi:dexter:5.0.0'
-
-    implementation 'com.shawnlin:number-picker:2.4.11'
 }
