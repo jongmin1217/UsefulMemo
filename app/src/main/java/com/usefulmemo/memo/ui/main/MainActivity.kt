@@ -10,6 +10,7 @@ import com.usefulmemo.memo.R
 import com.usefulmemo.memo.base.BaseActivity
 import com.usefulmemo.memo.base.BaseFragment
 import com.usefulmemo.memo.databinding.ActivityMainBinding
+import com.usefulmemo.memo.ui.main.fragment.AddFolderDialogFragment
 import com.usefulmemo.memo.ui.main.fragment.FolderFragment
 import com.usefulmemo.memo.ui.main.fragment.MemoFragment
 import com.usefulmemo.memo.utils.Constants
@@ -22,7 +23,8 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
     override val viewModel by viewModels<MainViewModel>()
 
     private val folderFragment = FolderFragment()
-    private val memoFragment = MemoFragment()
+    private val memoFragment by lazy { MemoFragment() }
+    private val addFolderDialogFragment by lazy { AddFolderDialogFragment() }
 
     private var time: Long = 0
 
@@ -46,6 +48,11 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
 
             back.observe(this@MainActivity, {
                 removeFragment()
+            })
+
+            addFolder.observe(this@MainActivity, { show ->
+                if(show) addFolderDialogFragment.show(supportFragmentManager, Constants.ADD_FOLDER)
+                else addFolderDialogFragment.dismiss()
             })
         }
     }

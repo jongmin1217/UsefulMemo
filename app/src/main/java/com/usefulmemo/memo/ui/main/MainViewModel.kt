@@ -20,11 +20,15 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     var folderItems = SingleLiveEvent<ArrayList<Folder>>().default(ArrayList())
+    var folderName = SingleLiveEvent<String>().default(String())
+
     private val _memo = SingleLiveEvent<Unit>()
     private val _back = SingleLiveEvent<Unit>()
+    private val _addFolder = SingleLiveEvent<Boolean>()
 
     val memo: LiveData<Unit> get() = _memo
     val back: LiveData<Unit> get() = _back
+    val addFolder: LiveData<Boolean> get() = _addFolder
 
     var previousStatus = 0
 
@@ -53,6 +57,7 @@ class MainViewModel @Inject constructor(
                         )
                     )
                 }
+
                 folderItems.value = list
             },
             onError = {
@@ -62,7 +67,7 @@ class MainViewModel @Inject constructor(
     }
 
     override fun addFolderClick() {
-        getFolderUseCase.completableMemo(Folder(0, "새로운 폴더"), Constants.INSERT)
+        _addFolder.value = true
     }
 
     override fun writeClick() {
@@ -133,6 +138,25 @@ class MainViewModel @Inject constructor(
             onError = {
                 Timber.d("timber getFolderMemo error $it")
             })
+    }
+
+    fun addFolderSave(){
+        folderName.value?.let {
+            if(it.isNotEmpty()){
+                getFolderUseCase.completableMemo(Folder(0,it),Constants.INSERT)
+            }
+        }
+
+        addFolderCancel()
+    }
+
+    fun addFolderCancel(){
+        _addFolder.value = false
+        folderName.value = ""
+    }
+
+    fun removeFolderName(){
+        folderName.value = ""
     }
 
 }

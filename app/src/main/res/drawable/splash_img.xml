@@ -5,9 +5,9 @@
 
     <item
         android:height="60dp"
-        android:width="230dp"
-        android:drawable="@drawable/splash"
+        android:width="270dp"
+        android:drawable="@drawable/userful_memo"
         android:gravity="center"
-        android:bottom="200dp"
+        android:bottom="250dp"
         />
 </layer-list>

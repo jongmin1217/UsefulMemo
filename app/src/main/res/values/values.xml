@@ -4,4 +4,6 @@
     <attr format="color" name="basicTextColor"/>
     <attr format="color" name="listBackground"/>
     <attr format="color" name="lineColor"/>
+    <attr format="color" name="dialogBackground"/>
+    <attr format="color" name="dialogEditBackground"/>
 </resources>

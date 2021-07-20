@@ -2,6 +2,14 @@
     <string name="folder">폴더</string>
     <string name="all_memo">모든 메모</string>
     <string name="memo">메모</string>
-    <string name="delete_memo">삭제된 메모</string>
+    <string name="delete_memo">휴지통</string>
     <string name="double_tab">뒤로 버튼을 한번 더 누르면 종료합니다.</string>
+
+    <string name="add_folder">폴더 추가</string>
+    <string name="plz_folder_name">폴더의 이름을 입력해주세요.</string>
+
+    <string name="folder_name">이름 (최대 15글자)</string>
+
+    <string name="cancel">취소</string>
+    <string name="save">저장</string>
 </resources>
