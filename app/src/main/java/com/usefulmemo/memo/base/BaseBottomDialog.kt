@@ -36,7 +36,8 @@ abstract class BaseBottomDialog <B : ViewDataBinding,VM : BaseViewModel>(@Layout
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetDialog(requireContext(),R.style.NewDialog).apply {
-            isCancelable = false
+            setCanceledOnTouchOutside(false)
+            behavior.isDraggable = false
         }
     }
 

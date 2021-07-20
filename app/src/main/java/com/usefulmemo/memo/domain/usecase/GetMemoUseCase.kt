@@ -12,14 +12,14 @@ import javax.inject.Inject
 
 class GetMemoUseCase @Inject constructor(private val repository: MemoRepository) : UseCase() {
 
-    fun singleMemo(
-        memoId: Long,
-        onSuccess: ((t: Memo) -> Unit),
+    fun singleInsert(
+        memo: Memo,
+        onSuccess: ((t: Long) -> Unit),
         onError: ((t: Throwable) -> Unit),
         onFinished: () -> Unit = {}
     ) {
         addDisposable(
-            repository.getMemo(memoId)
+            repository.insertMemo(memo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterTerminate(onFinished)
@@ -33,7 +33,6 @@ class GetMemoUseCase @Inject constructor(private val repository: MemoRepository)
         onError: ((t: Throwable) -> Unit),
         onFinished: () -> Unit = {}
     ) {
-        clearDisposable()
         addDisposable(
             if (type == Constants.ACTIVE) {
                 repository.getAllMemo()
@@ -53,7 +52,6 @@ class GetMemoUseCase @Inject constructor(private val repository: MemoRepository)
         onError: ((t: Throwable) -> Unit),
         onFinished: () -> Unit = {}
     ) {
-        clearDisposable()
         addDisposable(
             repository.getFolderMemo(folderId)
                 .subscribeOn(Schedulers.io())
@@ -70,7 +68,6 @@ class GetMemoUseCase @Inject constructor(private val repository: MemoRepository)
     ) {
         addDisposable(
             when (type) {
-                Constants.INSERT -> repository.insertMemo(memo)
                 Constants.UPDATE -> repository.updateMemo(memo)
                 else -> repository.deleteMemo(memo.id)
             }

@@ -30,13 +30,17 @@
 
         <TextView
             android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="?attr/basicTextColor"
             android:textSize="@dimen/dp_25"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_back"
+            app:layout_constraintEnd_toStartOf="@id/iv_write"
+            android:layout_marginEnd="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             marginStart="@{vm.titleBackVisible ? @dimen/dp_10 : @dimen/dp_25}"
             android:text="@{vm.titleText}"
             android:textStyle="bold"
@@ -66,6 +70,22 @@
             android:background="@drawable/write"
             android:visibility="@{vm.titleWriteVisible ? View.VISIBLE : View.INVISIBLE}"
             viewClick="@{()->vm.writeClick()}"
+            />
+
+        <TextView
+            android:id="@+id/tv_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/orange"
+            android:textSize="@dimen/dp_16"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="25dp"
+            android:text="@string/complete"
+            android:visibility="@{vm.titleCompleteVisible ? View.VISIBLE : View.INVISIBLE}"
+            viewClick="@{()->vm.completeClick()}"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

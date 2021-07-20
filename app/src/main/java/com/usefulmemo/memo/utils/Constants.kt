@@ -4,6 +4,9 @@ class Constants {
     companion object{
         const val ADD_FOLDER = "ADD_FOLDER"
 
+        const val FOLDER_FRAGMENT = "FolderFragment"
+        const val MEMO_FRAGMENT = "MemoFragment"
+
         const val INSERT = 0
         const val UPDATE = 1
         const val DELETE = 2

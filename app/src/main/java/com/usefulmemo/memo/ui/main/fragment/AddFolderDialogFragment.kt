@@ -1,6 +1,7 @@
 package com.usefulmemo.memo.ui.main.fragment
 
 import android.os.Bundle
+import android.text.Selection
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import com.usefulmemo.memo.R

@@ -11,10 +11,12 @@ open class BaseViewModel : ViewModel() {
     var titleWriteVisible = SingleLiveEvent<Boolean>().default(true)
     var titleAddFolderVisible = SingleLiveEvent<Boolean>().default(true)
     var titleBackVisible = SingleLiveEvent<Boolean>().default(false)
+    var titleCompleteVisible = SingleLiveEvent<Boolean>().default(false)
 
     fun <T : Any?> SingleLiveEvent<T>.default(initialValue: T) = apply { setValue(initialValue) }
 
     open fun addFolderClick(){}
     open fun writeClick(){}
     open fun backClick(){}
+    open fun completeClick(){}
 }

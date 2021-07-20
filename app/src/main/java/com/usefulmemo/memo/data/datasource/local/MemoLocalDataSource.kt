@@ -17,7 +17,7 @@ class MemoLocalDataSource @Inject constructor(
     fun getAllMemo() : Observable<List<Memo>> = local.getAllMemo()
     fun getFolderMemo(folderId : Long) : Observable<List<Memo>> = local.getFolderMemo(folderId)
     fun getMemo(memoId : Long) : Single<Memo> = local.getMemo(memoId)
-    fun insertMemo(memo : Memo) : Completable = local.insertMemo(memo)
+    fun insertMemo(memo : Memo) : Single<Long> = local.insertMemo(memo)
     fun updateMemo(memo: Memo) : Completable = local.updateMemo(memo)
     fun deleteMemo(id : Long) : Completable = local.deleteMemo(id)
     fun deleteFolderMemo(folderId : Long) : Completable = local.deleteFolderMemo(folderId)

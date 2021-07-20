@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.usefulmemo.memo.domain.model.Folder
+import com.usefulmemo.memo.domain.model.Memo
 import com.usefulmemo.memo.ui.main.FolderListAdapter
+import com.usefulmemo.memo.ui.main.MemoListAdapter
 
 object BindingAdapter {
 
@@ -52,6 +54,30 @@ object BindingAdapter {
     fun setFolderItems(view: RecyclerView, items : ArrayList<Folder>) {
         view.adapter?.let {
             (it as FolderListAdapter).items = items
+        }
+    }
+
+    @BindingAdapter("setMemoListAdapter")
+    @JvmStatic
+    fun setMemoListAdapter(view: RecyclerView, adapter : MemoListAdapter) {
+        if(!adapter.hasObservers()) adapter.setHasStableIds(true)
+
+        val lm = LinearLayoutManager(view.context)
+
+        view.layoutManager = lm
+        view.adapter = adapter
+
+        val animator = view.itemAnimator
+        if(animator is SimpleItemAnimator){
+            animator.supportsChangeAnimations = false
+        }
+    }
+
+    @BindingAdapter("setMemoItems")
+    @JvmStatic
+    fun setMemoItems(view: RecyclerView, items : ArrayList<Memo>) {
+        view.adapter?.let {
+            (it as MemoListAdapter).items = items
         }
     }
 }

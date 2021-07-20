@@ -1,7 +1,9 @@
 package com.usefulmemo.memo.ui.main
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
@@ -13,6 +15,7 @@ import com.usefulmemo.memo.databinding.ActivityMainBinding
 import com.usefulmemo.memo.ui.main.fragment.AddFolderDialogFragment
 import com.usefulmemo.memo.ui.main.fragment.FolderFragment
 import com.usefulmemo.memo.ui.main.fragment.MemoFragment
+import com.usefulmemo.memo.ui.main.fragment.WriteFragment
 import com.usefulmemo.memo.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -24,9 +27,8 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
 
     private val folderFragment = FolderFragment()
     private val memoFragment by lazy { MemoFragment() }
+    private val writeFragment by lazy { WriteFragment() }
     private val addFolderDialogFragment by lazy { AddFolderDialogFragment() }
-
-    private var time: Long = 0
 
     override fun initBinding() {
         binding.vm = viewModel
@@ -47,7 +49,15 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
             })
 
             back.observe(this@MainActivity, {
-                removeFragment()
+                previousFragmentCheck()
+            })
+
+            write.observe(this@MainActivity, {
+                nextFragment(writeFragment)
+            })
+
+            closeKeyboard.observe(this@MainActivity, {
+                closeKeyboard()
             })
 
             addFolder.observe(this@MainActivity, { show ->
@@ -57,9 +67,16 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
         }
     }
 
+    private fun closeKeyboard() {
+        this.currentFocus?.let {
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+    }
+
     private fun initFragment() {
         supportFragmentManager.beginTransaction()
-            .replace(binding.frameLayout.id, folderFragment).commit()
+            .replace(binding.frameLayout.id, folderFragment).addToBackStack(folderFragment.toString()).commit()
     }
 
     private fun nextFragment(fragment: Fragment) {
@@ -68,48 +85,55 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
             R.anim.out_left,
             R.anim.in_left,
             R.anim.out_right
-        ).replace(binding.frameLayout.id, fragment).addToBackStack(null).commit()
+        ).replace(binding.frameLayout.id, fragment).addToBackStack(fragment.toString()).commit()
     }
 
-    private fun removeFragment() {
+    private fun previousFragmentCheck() {
         for (fragment: Fragment in supportFragmentManager.fragments) {
             if (fragment.isVisible) {
-                if (fragment is FolderFragment) doubleTabBack()
-                else {
-                    supportFragmentManager.beginTransaction().remove(fragment).commit()
-                    supportFragmentManager.popBackStack()
-
-                    initTitle()
-                    break
+                when(fragment){
+                    is FolderFragment -> finish()
+                    is MemoFragment -> {
+                        viewModel.clearMemoObserve()
+                        removeFragment(fragment)
+                        break
+                    }
+                    else -> {
+                        viewModel.emptyMemoCheck()
+                        removeFragment(fragment)
+                        break
+                    }
                 }
             }
         }
     }
 
+    private fun removeFragment(fragment: Fragment){
+        supportFragmentManager.beginTransaction().remove(fragment).commit()
+        supportFragmentManager.popBackStack()
+
+        initTitle()
+    }
+
     private fun initTitle() {
-        if(viewModel.previousStatus == Constants.FOLDER_UI){
-            viewModel.setTitle(
-                backVisible = false,
-                addFolderVisible = true,
-                writeVisible = true,
-                text = MyApplication.mInstance.getString(R.string.folder)
-            )
+        with(supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount-2).toString()){
+            when{
+                contains(Constants.FOLDER_FRAGMENT) -> {
+                    viewModel.setTitle(
+                        backVisible = false,
+                        addFolderVisible = true,
+                        writeVisible = true,
+                        text = MyApplication.mInstance.getString(R.string.folder)
+                    )
+                }
+                contains(Constants.MEMO_FRAGMENT) -> {
+                    viewModel.setTitle(writeVisible = true)
+                }
+            }
         }
     }
 
     override fun onBackPressed() {
-        removeFragment()
+        previousFragmentCheck()
     }
-
-    private fun doubleTabBack() {
-        if (System.currentTimeMillis() - time >= 2000) {
-            time = System.currentTimeMillis()
-            Toast.makeText(this, resources.getString(R.string.double_tab), Toast.LENGTH_SHORT).show()
-        } else if (System.currentTimeMillis() - time < 2000) {
-            super.onBackPressed()
-            finish()
-            exitProcess(0)
-        }
-    }
-
 }

@@ -6,12 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.usefulmemo.memo.databinding.ItemFolderListBinding
+import com.usefulmemo.memo.databinding.ItemMemoListBinding
 import com.usefulmemo.memo.domain.model.Folder
+import com.usefulmemo.memo.domain.model.Memo
 import timber.log.Timber
 
-class FolderListAdapter(private val viewModel : MainViewModel) : RecyclerView.Adapter<FolderListAdapter.ListHolder>() {
+class MemoListAdapter (private val viewModel : MainViewModel) : RecyclerView.Adapter<MemoListAdapter.ListHolder>() {
 
-    var items = ArrayList<Folder>()
+    var items = ArrayList<Memo>()
         set(value){
             field = value
             notifyDataSetChanged()
@@ -20,7 +22,7 @@ class FolderListAdapter(private val viewModel : MainViewModel) : RecyclerView.Ad
     private var swipeLayout : SwipeRevealLayout? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListHolder {
-        val binding = ItemFolderListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemMemoListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ListHolder(binding)
     }
 
@@ -36,16 +38,14 @@ class FolderListAdapter(private val viewModel : MainViewModel) : RecyclerView.Ad
         holder.bind(items[position])
     }
 
-    inner class ListHolder(val binding: ItemFolderListBinding):
+    inner class ListHolder(val binding: ItemMemoListBinding):
         RecyclerView.ViewHolder(binding.root){
 
-        fun bind(folder : Folder){
-            binding.model = folder
+        fun bind(memo : Memo){
+            binding.model = memo
             binding.vm = viewModel
 
             if(adapterPosition == itemCount-1) binding.line.visibility = View.INVISIBLE
-
-            if(folder.id < 1) binding.swipeLayout.setLockDrag(true)
 
             binding.swipeLayout.setSwipeListener(
                 object : SwipeRevealLayout.SwipeListener{
@@ -61,14 +61,9 @@ class FolderListAdapter(private val viewModel : MainViewModel) : RecyclerView.Ad
                 }
             )
 
-            binding.ibDeleteFolder.setOnClickListener {
+            binding.ibDeleteMemo.setOnClickListener {
                 binding.swipeLayout.close(true)
-                viewModel.deleteFolder(folder)
-            }
-
-            binding.ibEditFolder.setOnClickListener {
-                binding.swipeLayout.close(true)
-                viewModel.editFolder(folder)
+                viewModel.deleteMemo(memo)
             }
         }
     }

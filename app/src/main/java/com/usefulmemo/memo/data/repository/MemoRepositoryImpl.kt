@@ -14,7 +14,7 @@ class MemoRepositoryImpl @Inject constructor(
     override fun getAllMemo(): Observable<List<Memo>> = dataSource.getAllMemo()
     override fun getFolderMemo(folderId : Long) : Observable<List<Memo>> = dataSource.getFolderMemo(folderId)
     override fun getMemo(memoId: Long): Single<Memo> = dataSource.getMemo(memoId)
-    override fun insertMemo(memo : Memo) : Completable = dataSource.insertMemo(memo)
+    override fun insertMemo(memo : Memo) : Single<Long> = dataSource.insertMemo(memo)
     override fun updateMemo(memo: Memo) : Completable = dataSource.updateMemo(memo)
     override fun deleteMemo(id : Long) : Completable = dataSource.deleteMemo(id)
     override fun deleteFolderMemo(folderId : Long) : Completable = dataSource.deleteFolderMemo(folderId)

@@ -40,7 +40,7 @@
                 android:textSize="@dimen/dp_18"
                 android:textStyle="bold"
                 android:textColor="?attr/basicTextColor"
-                android:text="@string/add_folder"
+                android:text="@{vm.editFolderInfo == null ? @string/add_folder : @string/edit_folder}"
                 />
 
             <TextView

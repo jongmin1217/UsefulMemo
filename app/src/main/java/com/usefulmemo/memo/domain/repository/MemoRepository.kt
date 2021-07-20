@@ -9,7 +9,7 @@ interface MemoRepository {
     fun getAllMemo() : Observable<List<Memo>>
     fun getFolderMemo(folderId : Long) : Observable<List<Memo>>
     fun getMemo(memoId : Long) : Single<Memo>
-    fun insertMemo(memo : Memo) : Completable
+    fun insertMemo(memo : Memo) : Single<Long>
     fun updateMemo(memo: Memo) : Completable
     fun deleteMemo(id : Long) : Completable
     fun deleteFolderMemo(folderId : Long) : Completable

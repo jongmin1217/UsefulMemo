@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="model"
+            type="com.usefulmemo.memo.domain.model.Memo" />
+
+        <variable
+            name="vm"
+            type="com.usefulmemo.memo.ui.main.MainViewModel" />
+    </data>
+
+    <com.chauthai.swipereveallayout.SwipeRevealLayout
+        android:id="@+id/swipe_layout"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        app:dragEdge="right"
+        app:mode="same_level">
+
+        <FrameLayout
+            android:layout_width="160dp"
+            android:layout_height="70dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageButton
+                    android:id="@+id/ib_edit_memo"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/icn_edit_folder"
+                    app:layout_constraintEnd_toStartOf="@id/ib_delete_memo"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/ib_delete_memo"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/icn_delete"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/ib_edit_memo"
+                    tools:ignore="ContentDescription" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                viewClick="@{()->vm.memoClick(model)}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:ignore="SpUsage,ContentDescription">
+
+                <TextView
+                    android:id="@+id/tv_memo_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:text="@{model.textCheck() ? @string/new_memo : model.getTextInfo().size() != 0 ? model.getTextInfo()[0] : null}"
+                    android:textColor="?attr/basicTextColor"
+                    android:textSize="@dimen/dp_16"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_reg_date"
+                    android:layout_marginEnd="20dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:id="@+id/tv_reg_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/basicTextColor"
+                    android:textSize="@dimen/dp_14"
+                    android:textStyle="normal"
+                    app:layout_constraintTop_toTopOf="@id/tv_memo_name"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_memo_name"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="16dp"
+                    android:text="@{model.getDate()}"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_info"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/tv_memo_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_memo_name"
+                    app:layout_constraintEnd_toEndOf="@id/tv_reg_date"
+                    android:layout_marginTop="5dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="@dimen/dp_14"
+                    android:textStyle="normal"
+                    android:textColor="?attr/basicTextColor"
+                    android:text="@{model.getTextInfo().size() &lt; 2 ? @string/no_text : model.getTextInfo()[1]}"
+                    />
+
+                <View
+                    android:id="@+id/line"
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    android:background="?attr/lineColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/tv_memo_name"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+
+    </com.chauthai.swipereveallayout.SwipeRevealLayout>
+
+
+</layout>

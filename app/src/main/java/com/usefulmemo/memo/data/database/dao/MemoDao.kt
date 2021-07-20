@@ -22,7 +22,7 @@ interface MemoDao {
     fun getMemo(memoId : Long) : Single<Memo>
 
     @Insert
-    fun insertMemo(memo : Memo) : Completable
+    fun insertMemo(memo : Memo) : Single<Long>
 
     @Update
     fun updateMemo(memo: Memo) : Completable
