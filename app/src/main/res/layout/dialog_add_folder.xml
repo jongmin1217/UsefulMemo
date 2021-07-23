@@ -75,6 +75,7 @@
                 android:paddingEnd="10dp"
                 android:maxLength="15"
                 android:text="@={vm.folderName}"
+                setFocus="@{vm.folderName}"
                 >
                 <requestFocus />
             </EditText>

@@ -45,7 +45,7 @@ class MainViewModel @Inject constructor(
     var memoItems = SingleLiveEvent<ArrayList<Memo>>().default(ArrayList())
 
 
-    private var selectMemo: Memo? = null
+    var selectMemo: Memo? = null
 
     private var timer = Timer()
 
@@ -66,6 +66,7 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
 
 
     init {
@@ -103,6 +104,7 @@ class MainViewModel @Inject constructor(
     }
 
     override fun addFolderClick() {
+        folderName.value = ""
         editFolderInfo = null
         _addFolder.value = true
     }

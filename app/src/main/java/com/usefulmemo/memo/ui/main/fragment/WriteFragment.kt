@@ -33,12 +33,12 @@ class WriteFragment : BaseFragment<FragmentWriteBinding, MainViewModel>(R.layout
     }
 
     private fun initListener() {
-        activity?.let{
+        activity?.let {
             keyboardVisibilityUtils = KeyboardVisibilityUtils(it.window,
                 onShowKeyboard = {
-                    viewModel.titleCompleteVisible.value = true
+                    if (viewModel.selectMemo != null) viewModel.titleCompleteVisible.value = true
                 }, onHideKeyboard = {
-                    viewModel.titleCompleteVisible.value = false
+                    if (viewModel.selectMemo != null) viewModel.titleCompleteVisible.value = false
                 })
         }
     }
