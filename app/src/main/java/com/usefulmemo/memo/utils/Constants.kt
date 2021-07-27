@@ -4,6 +4,9 @@ class Constants {
     companion object{
         const val ADD_FOLDER = "ADD_FOLDER"
 
+        const val SCROLL_VALUE = "SCROLL_VALUE"
+        const val FOLDER_ID = "FOLDER_ID"
+
         const val FOLDER_FRAGMENT = "FolderFragment"
         const val MEMO_FRAGMENT = "MemoFragment"
 
@@ -11,9 +14,7 @@ class Constants {
         const val UPDATE = 1
         const val DELETE = 2
 
-        const val FOLDER_UI = 0
-        const val MEMO_UI = 1
-        const val WRITE_UI = 2
+        const val CLOSE = (-1).toLong()
 
         const val ACTIVE = 0
         const val INACTIVE = 1

@@ -95,9 +95,6 @@ object BindingAdapter {
     @JvmStatic
     fun setFocus(view: EditText, value : String) {
         view.setSelection(value.length)
-
-        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
 }

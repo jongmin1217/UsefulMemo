@@ -1,7 +1,9 @@
 package com.usefulmemo.memo.ui.main.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.activityViewModels
 import com.usefulmemo.memo.R
 import com.usefulmemo.memo.base.BaseFragment
@@ -10,7 +12,9 @@ import com.usefulmemo.memo.ui.main.FolderListAdapter
 import com.usefulmemo.memo.ui.main.MainViewModel
 import com.usefulmemo.memo.ui.main.MemoListAdapter
 import com.usefulmemo.memo.utils.BindingAdapter
+import com.usefulmemo.memo.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MemoFragment  : BaseFragment<FragmentMemoBinding, MainViewModel>(R.layout.fragment_memo) {
@@ -27,5 +31,12 @@ class MemoFragment  : BaseFragment<FragmentMemoBinding, MainViewModel>(R.layout.
             binding.recyclerviewMemo,
             MemoListAdapter(viewModel)
         )
+
+    }
+
+
+    override fun onDestroy() {
+        binding.scrollView.smoothScrollTo(0,0)
+        super.onDestroy()
     }
 }

@@ -40,7 +40,6 @@
                 android:textSize="@dimen/dp_18"
                 android:textStyle="bold"
                 android:textColor="?attr/basicTextColor"
-                android:text="@{vm.editFolderInfo == null ? @string/add_folder : @string/edit_folder}"
                 />
 
             <TextView
@@ -90,7 +89,6 @@
                 android:background="@drawable/remove"
                 android:layout_marginEnd="10dp"
                 android:visibility= "@{vm.folderName.empty ? View.INVISIBLE : View.VISIBLE}"
-                viewClick="@{()->vm.removeFolderName()}"
                 />
 
             <View
@@ -127,7 +125,6 @@
                 android:textColor="@color/orange"
                 android:text="@string/cancel"
                 android:gravity="center"
-                viewClick="@{()->vm.addFolderCancel()}"
                 android:textStyle="bold"
                 />
 
@@ -143,7 +140,6 @@
                 android:text="@string/save"
                 android:gravity="center"
                 android:textStyle="bold"
-                viewClick="@{()->vm.addFolderSave()}"
                 />
 
 

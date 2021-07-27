@@ -1,6 +1,7 @@
 package com.usefulmemo.memo.ui.main
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.usefulmemo.memo.MyApplication
 import com.usefulmemo.memo.R
 import com.usefulmemo.memo.base.BaseViewModel
@@ -26,32 +27,31 @@ class MainViewModel @Inject constructor(
 
     var folderItems = SingleLiveEvent<ArrayList<Folder>>().default(ArrayList())
     var folderName = SingleLiveEvent<String>().default(String())
+    var memoItems = SingleLiveEvent<ArrayList<Memo>>().default(ArrayList())
 
     private val _memo = SingleLiveEvent<Unit>()
     private val _back = SingleLiveEvent<Unit>()
     private val _write = SingleLiveEvent<Unit>()
     private val _closeKeyboard = SingleLiveEvent<Unit>()
-    private val _addFolder = SingleLiveEvent<Boolean>()
+    private val _addFolder = SingleLiveEvent<Folder?>()
 
     val memo: LiveData<Unit> get() = _memo
     val back: LiveData<Unit> get() = _back
     val write: LiveData<Unit> get() = _write
     val closeKeyboard: LiveData<Unit> get() = _closeKeyboard
-    val addFolder: LiveData<Boolean> get() = _addFolder
+    val addFolder: LiveData<Folder?> get() = _addFolder
 
-    var editFolderInfo: Folder? = null
+    val uiStatus = UiStatus()
 
-    private var selectFolderId: Long = Constants.MEMO.toLong()
-    var memoItems = SingleLiveEvent<ArrayList<Memo>>().default(ArrayList())
+    var selectFolderId: Long = Constants.MEMO.toLong()
 
-
-    var selectMemo: Memo? = null
+    var firstLoad = true
 
     private var timer = Timer()
 
     var memoText: String by Delegates.observable("") { _, old, new ->
         if (old != new) {
-            selectMemo?.let {
+            uiStatus.selectMemo?.let {
                 timer.cancel()
                 timer = Timer()
                 timer.schedule(object : TimerTask() {
@@ -66,7 +66,6 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
 
 
     init {
@@ -103,18 +102,30 @@ class MainViewModel @Inject constructor(
         )
     }
 
+    fun setTitle(
+        backVisible: Boolean? = null,
+        addFolderVisible: Boolean? = null,
+        writeVisible: Boolean? = null,
+        completeVisible: Boolean? = null,
+        text: String? = null
+    ) {
+        backVisible?.let { titleBackVisible.value = it }
+        addFolderVisible?.let { titleAddFolderVisible.value = it }
+        writeVisible?.let { titleWriteVisible.value = it }
+        completeVisible?.let { titleCompleteVisible.value = it }
+        text?.let { titleText.value = it }
+    }
+
     override fun addFolderClick() {
-        folderName.value = ""
-        editFolderInfo = null
-        _addFolder.value = true
+        _addFolder.value = Folder(0, "")
     }
 
     override fun writeClick() {
-        selectMemo =
+        uiStatus.selectMemo =
             Memo(0, "", Util.getUnixTime(), true, if (selectFolderId < 1) 0 else selectFolderId)
         memoText = ""
 
-        selectMemo?.let { memo ->
+        uiStatus.selectMemo?.let { memo ->
             getMemoUseCase.singleInsert(memo,
                 onSuccess = {
                     memo.id = it
@@ -137,11 +148,9 @@ class MainViewModel @Inject constructor(
     }
 
     fun folderClick(folder: Folder) {
-        when (folder.id.toInt()) {
-            Constants.ALL_MEMO -> getAllMemo()
-            Constants.DELETE_MEMO -> getDeleteMemo()
-            else -> getFolderMemo(folder.id)
-        }
+        selectFolderId = folder.id
+
+        getMemo(folder.id)
 
         setTitle(
             backVisible = true,
@@ -153,7 +162,7 @@ class MainViewModel @Inject constructor(
 
     fun memoClick(memo: Memo) {
         memoText = memo.text
-        selectMemo = memo
+        uiStatus.selectMemo = memo
         goWrite()
     }
 
@@ -166,75 +175,46 @@ class MainViewModel @Inject constructor(
         _write.value = Unit
     }
 
-    fun setTitle(
-        backVisible: Boolean? = null,
-        addFolderVisible: Boolean? = null,
-        writeVisible: Boolean? = null,
-        completeVisible: Boolean? = null,
-        text: String? = null
-    ) {
-        backVisible?.let { titleBackVisible.value = it }
-        addFolderVisible?.let { titleAddFolderVisible.value = it }
-        writeVisible?.let { titleWriteVisible.value = it }
-        completeVisible?.let { titleCompleteVisible.value = it }
-        text?.let { titleText.value = it }
+    private fun getMemo(folderId: Long) {
+        firstLoad = true
+
+        if (folderId < 0) {
+            getMemoUseCase.observableMemoList(if (folderId.toInt() == Constants.ALL_MEMO) Constants.ACTIVE else Constants.INACTIVE,
+                onSuccess = {
+                    setMemoItem(it as ArrayList<Memo>)
+                },
+                onError = {
+                    Timber.d("timber $it")
+                })
+        }else{
+            getMemoUseCase.observableMemoFolderList(folderId,
+                onSuccess = {
+                    setMemoItem(it as ArrayList<Memo>)
+                },
+                onError = {
+                    Timber.d("timber $it")
+                })
+        }
+
     }
 
-    private fun getAllMemo() {
-        var firstLoad = true
-        getMemoUseCase.observableMemoList(Constants.ACTIVE,
-            onSuccess = {
-                selectFolderId = Constants.ALL_MEMO.toLong()
-                memoItems.value = it as ArrayList<Memo>
-                if (firstLoad) {
-                    _memo.value = Unit
-                    firstLoad = false
-                }
-            },
-            onError = {
-                Timber.d("timber getAllMemo error $it")
-            })
+    private fun setMemoItem(items: ArrayList<Memo>) {
+        memoItems.value = items
+        if (firstLoad) {
+            _memo.value = Unit
+            firstLoad = false
+        }
     }
 
-    private fun getDeleteMemo() {
-        var firstLoad = true
-        getMemoUseCase.observableMemoList(Constants.INACTIVE,
-            onSuccess = {
-                selectFolderId = Constants.DELETE_MEMO.toLong()
-                memoItems.value = it as ArrayList<Memo>
-                if (firstLoad) {
-                    _memo.value = Unit
-                    firstLoad = false
-                }
-            },
-            onError = {
-                Timber.d("timber getDeleteMemo error $it")
-            })
-    }
 
-    private fun getFolderMemo(folderId: Long) {
-        var firstLoad = true
-        getMemoUseCase.observableMemoFolderList(folderId,
-            onSuccess = {
-                selectFolderId = folderId
-                memoItems.value = it as ArrayList<Memo>
-                if (firstLoad) {
-                    _memo.value = Unit
-                    firstLoad = false
-                }
-            },
-            onError = {
-                Timber.d("timber getFolderMemo error $it")
-            })
-    }
-
-    fun addFolderSave() {
+    fun addFolderSave(folderId: Long) {
         folderName.value?.let {
             if (it.isNotEmpty()) {
                 getFolderUseCase.completableMemo(
                     Folder(
-                        if (editFolderInfo == null) 0 else editFolderInfo?.id ?: 0, it
-                    ), if (editFolderInfo == null) Constants.INSERT else Constants.UPDATE
+                        folderId, it
+                    ),
+                    if (folderId == 0.toLong()) Constants.INSERT else Constants.UPDATE
                 )
                 addFolderCancel()
             }
@@ -242,13 +222,9 @@ class MainViewModel @Inject constructor(
     }
 
     fun addFolderCancel() {
-        _addFolder.value = false
-        folderName.value = ""
+        _addFolder.value = null
     }
 
-    fun removeFolderName() {
-        folderName.value = ""
-    }
 
     fun deleteFolder(folder: Folder) {
         getFolderUseCase.completableMemo(folder, Constants.DELETE)
@@ -264,9 +240,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun editFolder(folder: Folder) {
-        editFolderInfo = folder
-        folderName.value = folder.name
-        _addFolder.value = true
+        _addFolder.value = folder
     }
 
     fun clearMemoObserve() {
@@ -274,12 +248,20 @@ class MainViewModel @Inject constructor(
     }
 
     fun emptyMemoCheck() {
-        selectMemo?.let {
+        uiStatus.selectMemo?.let {
             if (it.text.isEmpty()) {
                 getMemoUseCase.completableMemo(it, Constants.DELETE)
             }
         }
 
-        selectMemo = null
+        uiStatus.selectMemo = null
+
+        titleCompleteVisible.value?.let {
+            if (it) titleCompleteVisible.value = false
+        }
     }
+
+    data class UiStatus(
+        var selectMemo: Memo? = null
+    )
 }

@@ -60,8 +60,11 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
                 closeKeyboard()
             })
 
-            addFolder.observe(this@MainActivity, { show ->
-                if(show) addFolderDialogFragment.show(supportFragmentManager, Constants.ADD_FOLDER)
+            addFolder.observe(this@MainActivity, { folder ->
+                if(folder != null){
+                    addFolderDialogFragment.folder = folder
+                    addFolderDialogFragment.show(supportFragmentManager, Constants.ADD_FOLDER)
+                }
                 else addFolderDialogFragment.dismiss()
             })
         }
@@ -107,6 +110,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
             }
         }
     }
+
 
     private fun removeFragment(fragment: Fragment){
         supportFragmentManager.beginTransaction().remove(fragment).commit()
