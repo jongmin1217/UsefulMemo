@@ -17,8 +17,14 @@ import com.usefulmemo.memo.ui.main.fragment.FolderFragment
 import com.usefulmemo.memo.ui.main.fragment.MemoFragment
 import com.usefulmemo.memo.ui.main.fragment.WriteFragment
 import com.usefulmemo.memo.utils.Constants
+import com.usefulmemo.memo.utils.Util
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
@@ -97,8 +103,20 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
                 when(fragment){
                     is FolderFragment -> finish()
                     is MemoFragment -> {
-                        viewModel.clearMemoObserve()
-                        removeFragment(fragment)
+                        memoFragment.binding.scrollView.smoothScrollTo(0, 0)
+
+                        Timer().schedule(object : TimerTask() {
+                            override fun run() {
+                                GlobalScope.launch(Dispatchers.Main){
+                                    viewModel.clearMemoObserve()
+                                    removeFragment(fragment)
+                                }
+
+
+                            }
+                        }, 1000)
+//                        viewModel.clearMemoObserve()
+//                        removeFragment(fragment)
                         break
                     }
                     else -> {

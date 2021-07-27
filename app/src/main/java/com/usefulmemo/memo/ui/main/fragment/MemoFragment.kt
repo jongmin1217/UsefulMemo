@@ -35,8 +35,7 @@ class MemoFragment  : BaseFragment<FragmentMemoBinding, MainViewModel>(R.layout.
     }
 
 
-    override fun onDestroy() {
+    fun scroll(){
         binding.scrollView.smoothScrollTo(0,0)
-        super.onDestroy()
     }
 }
