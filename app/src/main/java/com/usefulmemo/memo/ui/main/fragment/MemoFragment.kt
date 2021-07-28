@@ -32,10 +32,12 @@ class MemoFragment  : BaseFragment<FragmentMemoBinding, MainViewModel>(R.layout.
             MemoListAdapter(viewModel)
         )
 
+        viewModel.setTitle(writeVisible = true)
     }
 
-
-    fun scroll(){
-        binding.scrollView.smoothScrollTo(0,0)
+    override fun onDestroy() {
+        viewModel.clearMemoObserve()
+        super.onDestroy()
     }
+
 }

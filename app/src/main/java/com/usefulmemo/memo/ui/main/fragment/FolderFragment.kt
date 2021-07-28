@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.AbsListView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.activityViewModels
+import com.usefulmemo.memo.MyApplication
 import com.usefulmemo.memo.R
 import com.usefulmemo.memo.base.BaseFragment
 import com.usefulmemo.memo.databinding.FragmentFolderBinding
@@ -29,6 +30,13 @@ class FolderFragment : BaseFragment<FragmentFolderBinding,MainViewModel>(R.layou
         BindingAdapter.setFolderListAdapter(
             binding.recyclerviewFolder,
             FolderListAdapter(viewModel)
+        )
+
+        viewModel.setTitle(
+            backVisible = false,
+            addFolderVisible = true,
+            writeVisible = true,
+            text = MyApplication.mInstance.getString(R.string.folder)
         )
     }
 

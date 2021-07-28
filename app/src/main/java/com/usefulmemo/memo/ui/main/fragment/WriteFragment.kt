@@ -32,6 +32,11 @@ class WriteFragment : BaseFragment<FragmentWriteBinding, MainViewModel>(R.layout
 
     }
 
+    override fun onDestroy() {
+        viewModel.emptyMemoCheck()
+        super.onDestroy()
+    }
+
     private fun initListener() {
         activity?.let {
             keyboardVisibilityUtils = KeyboardVisibilityUtils(it.window,

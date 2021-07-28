@@ -16,6 +16,7 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel>(@LayoutRes 
     abstract fun initBinding()
     lateinit var binding : B
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

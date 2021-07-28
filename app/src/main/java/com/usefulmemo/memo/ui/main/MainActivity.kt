@@ -32,8 +32,6 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
     override val viewModel by viewModels<MainViewModel>()
 
     private val folderFragment = FolderFragment()
-    private val memoFragment by lazy { MemoFragment() }
-    private val writeFragment by lazy { WriteFragment() }
     private val addFolderDialogFragment by lazy { AddFolderDialogFragment() }
 
     override fun initBinding() {
@@ -51,7 +49,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
 
         with(viewModel) {
             memo.observe(this@MainActivity, {
-                nextFragment(memoFragment)
+                nextFragment(MemoFragment())
             })
 
             back.observe(this@MainActivity, {
@@ -59,7 +57,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
             })
 
             write.observe(this@MainActivity, {
-                nextFragment(writeFragment)
+                nextFragment(WriteFragment())
             })
 
             closeKeyboard.observe(this@MainActivity, {
@@ -67,25 +65,26 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
             })
 
             addFolder.observe(this@MainActivity, { folder ->
-                if(folder != null){
+                if (folder != null) {
                     addFolderDialogFragment.folder = folder
                     addFolderDialogFragment.show(supportFragmentManager, Constants.ADD_FOLDER)
-                }
-                else addFolderDialogFragment.dismiss()
+                } else addFolderDialogFragment.dismiss()
             })
         }
     }
 
     private fun closeKeyboard() {
         this.currentFocus?.let {
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val inputMethodManager =
+                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
         }
     }
 
     private fun initFragment() {
         supportFragmentManager.beginTransaction()
-            .replace(binding.frameLayout.id, folderFragment).addToBackStack(folderFragment.toString()).commit()
+            .replace(binding.frameLayout.id, folderFragment)
+            .addToBackStack(folderFragment.toString()).commit()
     }
 
     private fun nextFragment(fragment: Fragment) {
@@ -98,61 +97,16 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
     }
 
     private fun previousFragmentCheck() {
-        for (fragment: Fragment in supportFragmentManager.fragments) {
-            if (fragment.isVisible) {
-                when(fragment){
-                    is FolderFragment -> finish()
-                    is MemoFragment -> {
-                        memoFragment.binding.scrollView.smoothScrollTo(0, 0)
-
-                        Timer().schedule(object : TimerTask() {
-                            override fun run() {
-                                GlobalScope.launch(Dispatchers.Main){
-                                    viewModel.clearMemoObserve()
-                                    removeFragment(fragment)
-                                }
-
-
-                            }
-                        }, 1000)
-//                        viewModel.clearMemoObserve()
-//                        removeFragment(fragment)
-                        break
-                    }
-                    else -> {
-                        viewModel.emptyMemoCheck()
-                        removeFragment(fragment)
-                        break
-                    }
-                }
-            }
+        when (val fragment = supportFragmentManager.fragments[0]) {
+            is FolderFragment -> finish()
+            else -> removeFragment(fragment)
         }
     }
 
 
-    private fun removeFragment(fragment: Fragment){
+    private fun removeFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction().remove(fragment).commit()
         supportFragmentManager.popBackStack()
-
-        initTitle()
-    }
-
-    private fun initTitle() {
-        with(supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount-2).toString()){
-            when{
-                contains(Constants.FOLDER_FRAGMENT) -> {
-                    viewModel.setTitle(
-                        backVisible = false,
-                        addFolderVisible = true,
-                        writeVisible = true,
-                        text = MyApplication.mInstance.getString(R.string.folder)
-                    )
-                }
-                contains(Constants.MEMO_FRAGMENT) -> {
-                    viewModel.setTitle(writeVisible = true)
-                }
-            }
-        }
     }
 
     override fun onBackPressed() {
