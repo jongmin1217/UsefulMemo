@@ -33,19 +33,17 @@ class MainViewModel @Inject constructor(
     private val _back = SingleLiveEvent<Unit>()
     private val _write = SingleLiveEvent<Unit>()
     private val _closeKeyboard = SingleLiveEvent<Unit>()
-    private val _addFolder = SingleLiveEvent<Folder?>()
+    private val _addFolder = SingleLiveEvent<Folder>()
 
     val memo: LiveData<Unit> get() = _memo
     val back: LiveData<Unit> get() = _back
     val write: LiveData<Unit> get() = _write
     val closeKeyboard: LiveData<Unit> get() = _closeKeyboard
-    val addFolder: LiveData<Folder?> get() = _addFolder
+    val addFolder: LiveData<Folder> get() = _addFolder
 
     val uiStatus = UiStatus()
 
     var selectFolderId: Long = Constants.MEMO.toLong()
-
-    var firstLoad = true
 
     private var timer = Timer()
 
@@ -151,7 +149,7 @@ class MainViewModel @Inject constructor(
         selectFolderId = folder.id
 
         getMemo(folder.id)
-
+        _memo.value = Unit
         setTitle(
             backVisible = true,
             addFolderVisible = false,
@@ -176,12 +174,10 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getMemo(folderId: Long) {
-        firstLoad = true
-
         if (folderId < 0) {
             getMemoUseCase.observableMemoList(if (folderId.toInt() == Constants.ALL_MEMO) Constants.ACTIVE else Constants.INACTIVE,
                 onSuccess = {
-                    setMemoItem(it as ArrayList<Memo>)
+                    memoItems.value = it as ArrayList<Memo>
                 },
                 onError = {
                     Timber.d("timber $it")
@@ -189,7 +185,7 @@ class MainViewModel @Inject constructor(
         }else{
             getMemoUseCase.observableMemoFolderList(folderId,
                 onSuccess = {
-                    setMemoItem(it as ArrayList<Memo>)
+                    memoItems.value = it as ArrayList<Memo>
                 },
                 onError = {
                     Timber.d("timber $it")
@@ -198,33 +194,16 @@ class MainViewModel @Inject constructor(
 
     }
 
-    private fun setMemoItem(items: ArrayList<Memo>) {
-        memoItems.value = items
-        if (firstLoad) {
-            _memo.value = Unit
-            firstLoad = false
-        }
-    }
-
-
     fun addFolderSave(folderId: Long) {
         folderName.value?.let {
             if (it.isNotEmpty()) {
                 getFolderUseCase.completableMemo(
-                    Folder(
-                        folderId, it
-                    ),
+                    Folder(folderId, it),
                     if (folderId == 0.toLong()) Constants.INSERT else Constants.UPDATE
                 )
-                addFolderCancel()
             }
         }
     }
-
-    fun addFolderCancel() {
-        _addFolder.value = null
-    }
-
 
     fun deleteFolder(folder: Folder) {
         getFolderUseCase.completableMemo(folder, Constants.DELETE)

@@ -32,7 +32,6 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
     override val viewModel by viewModels<MainViewModel>()
 
     private val folderFragment = FolderFragment()
-    private val addFolderDialogFragment by lazy { AddFolderDialogFragment() }
 
     override fun initBinding() {
         binding.vm = viewModel
@@ -65,10 +64,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
             })
 
             addFolder.observe(this@MainActivity, { folder ->
-                if (folder != null) {
-                    addFolderDialogFragment.folder = folder
-                    addFolderDialogFragment.show(supportFragmentManager, Constants.ADD_FOLDER)
-                } else addFolderDialogFragment.dismiss()
+                AddFolderDialogFragment(folder).show(supportFragmentManager, Constants.ADD_FOLDER)
             })
         }
     }

@@ -91,10 +91,5 @@ object BindingAdapter {
         }
     }
 
-    @BindingAdapter("setFocus")
-    @JvmStatic
-    fun setFocus(view: EditText, value : String) {
-        view.setSelection(value.length)
-    }
 
 }

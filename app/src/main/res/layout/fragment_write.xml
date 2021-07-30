@@ -37,7 +37,6 @@
                 android:textColor="?attr/basicTextColor"
                 android:textSize="@dimen/dp_16"
                 android:text="@={vm.memoText}"
-                setFocus="@{vm.memoText}"
                 >
                 <requestFocus />
             </EditText>

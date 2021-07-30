@@ -29,7 +29,6 @@ class WriteFragment : BaseFragment<FragmentWriteBinding, MainViewModel>(R.layout
         super.onViewCreated(view, savedInstanceState)
 
         initListener()
-
     }
 
     override fun onDestroy() {
