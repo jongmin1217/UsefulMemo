@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import com.usefulmemo.memo.R
 import com.usefulmemo.memo.base.BaseFragment
 import com.usefulmemo.memo.databinding.FragmentMemoBinding
+import com.usefulmemo.memo.domain.model.Folder
 import com.usefulmemo.memo.ui.main.FolderListAdapter
 import com.usefulmemo.memo.ui.main.MainViewModel
 import com.usefulmemo.memo.ui.main.MemoListAdapter
@@ -17,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
-class MemoFragment  : BaseFragment<FragmentMemoBinding, MainViewModel>(R.layout.fragment_memo) {
+class MemoFragment : BaseFragment<FragmentMemoBinding, MainViewModel>(R.layout.fragment_memo) {
     override val viewModel by activityViewModels<MainViewModel>()
 
     override fun initBinding() {

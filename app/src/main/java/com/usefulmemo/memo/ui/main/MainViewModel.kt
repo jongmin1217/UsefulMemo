@@ -31,15 +31,15 @@ class MainViewModel @Inject constructor(
 
     private val _memo = SingleLiveEvent<Unit>()
     private val _back = SingleLiveEvent<Unit>()
-    private val _write = SingleLiveEvent<Unit>()
+    private val _write = SingleLiveEvent<Memo>()
     private val _closeKeyboard = SingleLiveEvent<Unit>()
-    private val _addFolder = SingleLiveEvent<Folder>()
+    private val _addFolder = SingleLiveEvent<Folder?>()
 
     val memo: LiveData<Unit> get() = _memo
     val back: LiveData<Unit> get() = _back
-    val write: LiveData<Unit> get() = _write
+    val write: LiveData<Memo> get() = _write
     val closeKeyboard: LiveData<Unit> get() = _closeKeyboard
-    val addFolder: LiveData<Folder> get() = _addFolder
+    val addFolder: LiveData<Folder?> get() = _addFolder
 
     val uiStatus = UiStatus()
 
@@ -115,25 +115,22 @@ class MainViewModel @Inject constructor(
     }
 
     override fun addFolderClick() {
-        _addFolder.value = Folder(0, "")
+        _addFolder.value = null
     }
 
-    override fun writeClick() {
-        uiStatus.selectMemo =
+    fun writeClick(folderId : Long) {
+        val addMemo =
             Memo(0, "", Util.getUnixTime(), true, if (selectFolderId < 1) 0 else selectFolderId)
-        memoText = ""
 
-        uiStatus.selectMemo?.let { memo ->
-            getMemoUseCase.singleInsert(memo,
-                onSuccess = {
-                    memo.id = it
-                },
-                onError = {
-                    Timber.d("timber insert error $it")
-                }
-            )
-            goWrite()
-        }
+        getMemoUseCase.singleInsert(addMemo,
+            onSuccess = {
+                addMemo.id = it
+                _write.value = addMemo
+            },
+            onError = {
+                Timber.d("timber insert error $it")
+            }
+        )
 
     }
 
@@ -159,19 +156,9 @@ class MainViewModel @Inject constructor(
     }
 
     fun memoClick(memo: Memo) {
-        memoText = memo.text
-        uiStatus.selectMemo = memo
-        goWrite()
+        _write.value = memo
     }
 
-    private fun goWrite() {
-        setTitle(
-            backVisible = true,
-            addFolderVisible = false,
-            writeVisible = false
-        )
-        _write.value = Unit
-    }
 
     private fun getMemo(folderId: Long) {
         if (folderId < 0) {
@@ -182,7 +169,7 @@ class MainViewModel @Inject constructor(
                 onError = {
                     Timber.d("timber $it")
                 })
-        }else{
+        } else {
             getMemoUseCase.observableMemoFolderList(folderId,
                 onSuccess = {
                     memoItems.value = it as ArrayList<Memo>

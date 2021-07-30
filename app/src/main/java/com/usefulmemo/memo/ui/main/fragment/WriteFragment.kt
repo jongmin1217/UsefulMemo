@@ -28,12 +28,21 @@ class WriteFragment : BaseFragment<FragmentWriteBinding, MainViewModel>(R.layout
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initLayout()
         initListener()
     }
 
     override fun onDestroy() {
         viewModel.emptyMemoCheck()
         super.onDestroy()
+    }
+
+    private fun initLayout(){
+        viewModel.setTitle(
+            backVisible = true,
+            addFolderVisible = false,
+            writeVisible = false
+        )
     }
 
     private fun initListener() {

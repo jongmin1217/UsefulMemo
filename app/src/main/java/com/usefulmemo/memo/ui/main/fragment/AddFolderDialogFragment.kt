@@ -16,7 +16,7 @@ import com.usefulmemo.memo.ui.main.MainActivity
 import com.usefulmemo.memo.ui.main.MainViewModel
 import timber.log.Timber
 
-class AddFolderDialogFragment(private val folder : Folder) : BaseBottomDialog<DialogAddFolderBinding,MainViewModel>(R.layout.dialog_add_folder) {
+class AddFolderDialogFragment(private val folder : Folder?) : BaseBottomDialog<DialogAddFolderBinding,MainViewModel>(R.layout.dialog_add_folder) {
     override val viewModel by activityViewModels<MainViewModel>()
 
 
@@ -27,10 +27,10 @@ class AddFolderDialogFragment(private val folder : Folder) : BaseBottomDialog<Di
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvTitle.text = if(folder.id == 0.toLong()) resources.getString(R.string.add_folder)
+        binding.tvTitle.text = if(folder == null) resources.getString(R.string.add_folder)
         else resources.getString(R.string.edit_folder)
 
-        viewModel.folderName.value = folder.name
+        viewModel.folderName.value = folder?.name?:String()
 
         initListener()
     }
@@ -41,19 +41,19 @@ class AddFolderDialogFragment(private val folder : Folder) : BaseBottomDialog<Di
         }
 
         binding.tvSave.setOnClickListener {
-            viewModel.addFolderSave(folder.id)
+            viewModel.addFolderSave(folder?.id?:0)
             dismiss()
         }
 
         binding.ivRemove.setOnClickListener {
-            viewModel.folderName.value = ""
+            viewModel.folderName.value = String()
         }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
-        viewModel.folderName.value = ""
+        viewModel.folderName.value = String()
     }
 
 }
